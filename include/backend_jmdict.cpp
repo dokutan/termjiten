@@ -23,14 +23,20 @@
 #include <regex>
 
 #include "backend_jmdict.h"
+#include "utils.h"
 
 // Prints a JMdict entry
-void dictionary_jmdict::print_entry( pugi::xml_node& entry, std::ostream& output, bool color, bool verbose ){
-
+void dictionary_jmdict::print_entry( pugi::xml_node& entry, std::ostream& output, std::map< std::string, std::string >& options ){
+	
+	// parse options
+	bool color = string_to_bool( options["jmdict.color"], true );
+	bool verbose = string_to_bool( options["jmdict.verbose"], true );
+	bool symbols = string_to_bool( options["jmdict.symbols"], false );
+	
 	std::map< std::string, std::string > colors = {
 		{"keb", "\e[91m"},
 		{"reb", "\e[94m"},
-		{"gloss", "\e[90m"},
+		{"gloss", "\e[30m"},
 		{"extra", "\e[92m"},
 		{"reset", "\e[0m"}
 	};
@@ -45,12 +51,16 @@ void dictionary_jmdict::print_entry( pugi::xml_node& entry, std::ostream& output
 			output << (color ? colors["reset"] : "");
 		}
 		
-		// kanji information
-		/*for( pugi::xml_node ke_inf : k_ele.children("ke_inf") ){
-			output << (color ? colors["extra"] : "");
-			output << ke_inf.child_value() << "\n";
-			output << (color ? colors["reset"] : "");
-		}*/
+		if( verbose ){
+			
+			// kanji information
+			for( pugi::xml_node ke_inf : k_ele.children("ke_inf") ){
+				output << (color ? colors["extra"] : "");
+				output << (symbols ? "🛈 " : "Info: ") << entities[ke_inf.child_value()] << "\n";
+				output << (color ? colors["reset"] : "");
+			}
+		}
+		
 		
 	}
 
@@ -61,9 +71,29 @@ void dictionary_jmdict::print_entry( pugi::xml_node& entry, std::ostream& output
 			output << reb.child_value() << "\n";
 			output << (color ? colors["reset"] : "");
 		}
+		
+		// print extra information if requested
+		if( verbose ){
+			
+			// reading information
+			for( pugi::xml_node re_inf : r_ele.children("re_inf") ){
+				output << (color ? colors["extra"] : "");
+				output << (symbols ? "🛈 " : "Info: ") << entities[re_inf.child_value()] << "\n";
+				output << (color ? colors["reset"] : "");
+			}
+			
+			// reading restricted to one kanji element
+			for( pugi::xml_node re_restr : r_ele.children("re_restr") ){
+				output << (color ? colors["extra"] : "");
+				output << (symbols ? "⚠ " : "Restricted to: ") << re_restr.child_value() << "\n";
+				output << (color ? colors["reset"] : "");
+			}
+			
+		}
+		
 	}
 
-	// print all senses
+	// print all senses (meanings of the word/entry)
 	for( pugi::xml_node sense : entry.children("sense") ){
 		
 		// gloss (english meaning)
@@ -74,7 +104,22 @@ void dictionary_jmdict::print_entry( pugi::xml_node& entry, std::ostream& output
 			if( gloss.attribute("xml:lang") )
 				continue;
 			
-			meanings.push_back( gloss.child_value() );
+			// type? store meaning
+			if( verbose && gloss.attribute("g_type") ){
+				
+				std::string meaning = gloss.child_value();
+				meaning.append( color ? colors["extra"] : "" );
+				meaning.append( " (" );
+				meaning.append( gloss.attribute("g_type").value() );
+				meaning.append( ")" );
+				meaning.append( color ? colors["reset"] : "" );
+				
+				meanings.push_back( meaning );
+				
+			} else{
+				meanings.push_back( gloss.child_value() );
+			}
+			
 		}
 		if( meanings.size() > 0 )
 			output << (color ? colors["gloss"] : "") << meanings[0];
@@ -89,30 +134,51 @@ void dictionary_jmdict::print_entry( pugi::xml_node& entry, std::ostream& output
 			// sense information
 			for( pugi::xml_node s_inf : sense.children("s_inf") ){
 				output << (color ? colors["extra"] : "");
-				output << s_inf.child_value() << "\n";
+				output << (symbols ? "🛈 " : "Info: ") << s_inf.child_value() << "\n";
 				output << (color ? colors["reset"] : "");
 			}
 			
 			// restricted meanings
 			for( pugi::xml_node stagk : sense.children("stagk") ){
 				output << (color ? colors["extra"] : "");
-				output << "Restricted to: " << stagk.child_value() << "\n";
+				output << (symbols ? "⚠ " : "Restricted to: ") << stagk.child_value() << "\n";
 				output << (color ? colors["reset"] : "");
 			}
 			for( pugi::xml_node stagr : sense.children("stagr") ){
 				output << (color ? colors["extra"] : "");
-				output << "Restricted to: " << stagr.child_value() << "\n";
+				output << (symbols ? "⚠ " : "Restricted to: ") << stagr.child_value() << "\n";
+				output << (color ? colors["reset"] : "");
+			}
+			
+			// pos
+			for( pugi::xml_node pos : sense.children("pos") ){
+				output << (color ? colors["extra"] : "");
+				output << (symbols ? "💬 " : "Part-of-speech: ") << entities[pos.child_value()] << "\n";
+				output << (color ? colors["reset"] : "");
+			}
+			
+			// dialect TODO!
+			
+			// antonym
+			for( pugi::xml_node ant : sense.children("ant") ){
+				output << (color ? colors["extra"] : "");
+				output << (symbols ? "± " : "Antonym: ") << ant.child_value() << "\n";
 				output << (color ? colors["reset"] : "");
 			}
 			
 			// field
+			for( pugi::xml_node field : sense.children("field") ){
+				output << (color ? colors["extra"] : "");
+				output << (symbols ? "Ⓕ " : "Field: ") << entities[field.child_value()] << "\n";
+				output << (color ? colors["reset"] : "");
+			}
 			
-			// pos
+			// misc TODO!
 			
 			// cross references
 			for( pugi::xml_node xref : sense.children("xref") ){
 				output << (color ? colors["extra"] : "");
-				output << "See also: " << xref.child_value() << "\n";
+				output << (symbols ? "⇒ " : "See also: ") << xref.child_value() << "\n";
 				output << (color ? colors["reset"] : "");
 			}
 			
@@ -126,7 +192,7 @@ void dictionary_jmdict::print_entry( pugi::xml_node& entry, std::ostream& output
  * \param query search query
  * \param method string matching method (exact, fuzzy, regex)
  */
-void dictionary_jmdict::search( std::string query, std::string method, std::ostream& output, bool color, bool verbose ){
+void dictionary_jmdict::search( std::string query, std::string method, std::ostream& output, std::map< std::string, std::string >& options ){
 	
 	comparison comp(method);
 	
@@ -166,8 +232,40 @@ void dictionary_jmdict::search( std::string query, std::string method, std::ostr
 
 		// if match, print entry
 		if( match_found )
-			print_entry( entry, output, color, verbose );
+			print_entry( entry, output, options );
 		
 	}
 	
 }
+
+void dictionary_jmdict::parse_entities( std::string path ){
+	
+	// open file
+	std::ifstream xml_file( path );
+	if( !xml_file.is_open() )
+		return;
+	
+	std::string line;
+	while( std::getline( xml_file, line ) ){
+		
+		if( std::regex_match( line, std::regex("<!ENTITY [[:print:]]+ \\\"[[:print:]]+\\\">") ) ){
+			
+			std::string entity = std::regex_replace( line, std::regex("<!ENTITY "), "" );
+			entity = std::regex_replace( entity, std::regex(" \\\"[[:print:]]+\\\">"), "" );
+			
+			std::string value = std::regex_replace( line, std::regex("<!ENTITY [[:print:]]+ \\\""), "" );
+			value = std::regex_replace( value, std::regex("\">"), "" );
+			
+			entities[ "&"+entity+";" ] = value;
+		}
+		
+		// stop reading the file after all entities are loaded
+		if( line == "<JMdict>" )
+			break;
+		
+	}
+	
+	xml_file.close();
+	
+}
+	

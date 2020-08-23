@@ -4,7 +4,7 @@ CC_OPTIONS := -Wall -Wextra -O2 `pkg-config --cflags pugixml`
 LIBS != pkg-config --libs pugixml
 PREFIX = /usr
 
-build: backend_jmdict.o termjiten.o
+build: backend_jmdict.o termjiten.o utils.o
 	$(CC) *.o -o termjiten $(LIBS) $(CC_OPTIONS)
 
 clean:
@@ -26,5 +26,9 @@ uninstall:
 backend_jmdict.o:
 	$(CC) -c include/backend_jmdict.cpp $(CC_OPTIONS) -o backend_jmdict.o
 
+utils.o:
+	$(CC) -c include/utils.cpp $(CC_OPTIONS) -o utils.o
+
 termjiten.o:
 	$(CC) -c termjiten.cpp $(CC_OPTIONS) -o termjiten.o
+

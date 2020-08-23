@@ -24,6 +24,7 @@
 #include <vector>
 #include <map>
 #include <regex>
+#include <fstream>
 
 #include "comparison.h"
 
@@ -32,10 +33,15 @@ class dictionary_jmdict{
 	
 	private:
 		
-		void print_entry( pugi::xml_node& entry, std::ostream& output, bool color, bool verbose );
+		void print_entry( pugi::xml_node& entry, std::ostream& output, std::map< std::string, std::string >& options );
 		
 		pugi::xml_document jmdict;
 		pugi::xml_parse_result parse_result;
+		
+		/// a lookup table for the custom xml entities (these are not parsed by pugixml) 
+		std::map< std::string, std::string > entities;
+		
+		void parse_entities( std::string path );
 	
 	public:
 		
@@ -43,6 +49,7 @@ class dictionary_jmdict{
 		dictionary_jmdict( std::string path ){
 			
 			parse_result = jmdict.load_file( path.c_str(), pugi::parse_full );
+			parse_entities( path );
 			
 		}
 		
@@ -55,7 +62,7 @@ class dictionary_jmdict{
 		}
 		
 		/// Perform search, print results
-		void search( std::string query, std::string method, std::ostream& output, bool color, bool verbose );
+		void search( std::string query, std::string method, std::ostream& output, std::map< std::string, std::string >& options );
 	
 };
 

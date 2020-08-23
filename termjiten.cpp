@@ -24,20 +24,17 @@
 
 #include "include/options.h"
 #include "include/help.h"
+#include "include/simple_ini_parser.h"
+#include "include/utils.h"
 #include "include/backend_jmdict.h"
 
 int main( int argc, char *argv[] ){
 	
-	// determine jmdict path
-	char* jmdict_env = getenv( "JMDICT" );
-	std::string jmdict_path;
+	// Open config file
+	simple_ini_parser config;
+	config.read( "config.ini" ); // TODO! path
 	
-	if( jmdict_env == NULL )
-		jmdict_path = "/usr/share/termjiten/JMdict";
-	else
-		jmdict_path = jmdict_env;
-	
-	// Parse commandline arguments (TODO! verbose, color)
+	// Parse commandline arguments
 	std::string query, method;
 	
 	if( option_exists( "-h", argc, argv ) ){
@@ -69,15 +66,24 @@ int main( int argc, char *argv[] ){
 		
 	}
 	
-	// Open JMdict
-	dictionary_jmdict jmdict(jmdict_path);
-	if( !jmdict.is_open() ){
-		std::cerr << "Error: could not open " << jmdict_path << "\n";
-		return 1;
+	// JMdict
+	if( string_to_bool( config.get( "jmdict.enable", "true" ), true ) ){
+		
+		// Determine jmdict path, 1. env 2. config 3. default
+		char* jmdict_env = getenv( "JMDICT" );
+		std::string jmdict_path = ( jmdict_env == NULL ? config.get( "jmdict.path", "/usr/share/termjiten/JMdict" ) : jmdict_env );
+		
+		// Open JMdict
+		dictionary_jmdict jmdict(jmdict_path);
+		if( !jmdict.is_open() ){
+			std::cerr << "Error: could not open " << jmdict_path << "\n";
+			return 1;
+		}
+		
+		// Perform search
+		jmdict.search( query, method, std::cout, config.map() );
+		
 	}
-	
-	// Perform search
-	jmdict.search( query, method, std::cout, true, true );
 	
 	return 0;
 }
