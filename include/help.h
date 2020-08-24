@@ -41,7 +41,7 @@ void print_licenses( std::ostream& output ){
 	<< "the License, or (at your option) any later version.\n\n";
 	
 	output
-	<< "This program uses the JMdict/EDICT dictionary files. "
+	<< "This program uses the JMdict/EDICT and JMnedict/ENAMDICT dictionary files. "
 	<< "These files are the property of the Electronic Dictionary "
 	<< "Research and Development Group, and are used in conformance "
 	<< "with the Group's licence.\n"
@@ -49,6 +49,7 @@ void print_licenses( std::ostream& output ){
 	<< "/usr/share/doc/termjiten/jmdict.\n"
 	<< "http://www.edrdg.org\n"
 	<< "http://www.edrdg.org/wiki/index.php/JMdict-EDICT_Dictionary_Project\n"
+	<< "http://www.edrdg.org/enamdict/enamdict_doc.html\n"
 	<< "http://www.edrdg.org/edrdg/licence.html\n";
 	
 }

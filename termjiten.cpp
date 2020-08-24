@@ -27,6 +27,7 @@
 #include "include/simple_ini_parser.h"
 #include "include/utils.h"
 #include "include/backend_jmdict.h"
+#include "include/backend_jmnedict.h"
 
 int main( int argc, char *argv[] ){
 	
@@ -82,6 +83,26 @@ int main( int argc, char *argv[] ){
 		
 		// Perform search
 		jmdict.search( query, method, std::cout, config.map() );
+		
+	}
+	
+	// JMnedict
+	if( string_to_bool( config.get( "jmnedict.enable", "false" ), false ) ){
+		
+		// Determine jmnedict path, 1. env 2. config 3. default
+		//char* jmdict_env = getenv( "JMNEDICT" );
+		//std::string jmdict_path = ( jmdict_env == NULL ? config.get( "jmdict.path", "/usr/share/termjiten/JMdict" ) : jmdict_env );
+		std::string jmnedict_path = "JMnedict.xml";
+		
+		// Open JMdict
+		dictionary_jmnedict jmnedict(jmnedict_path);
+		if( !jmnedict.is_open() ){
+			std::cerr << "Error: could not open " << jmnedict_path << "\n";
+			return 1;
+		}
+		
+		// Perform search
+		jmnedict.search( query, method, std::cout, config.map() );
 		
 	}
 	

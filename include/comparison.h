@@ -16,6 +16,9 @@
  * 
  */
 
+#ifndef TERMJITEN_COMPARISON
+#define TERMJITEN_COMPARISON
+
 #include <string>
 #include <regex>
 
@@ -57,3 +60,5 @@ class comparison{
 			return false;
 		}
 };
+
+#endif
