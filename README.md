@@ -41,6 +41,9 @@ Regex based search term matching
 termjiten -r query
 ```
 
+### Configuration
+You can use an .ini file to modify the output format and select which dictionaries should be searched. The default path for this is ``$HOME/.config/termjiten.ini``, if the ``TERMJITEN_CONFIG`` environmental variable is set, that is used as a path. An annotated example is found in this directory.
+
 ## TODO
 - Use additional sources to display more detailed information
 

@@ -31,10 +31,6 @@
 
 int main( int argc, char *argv[] ){
 	
-	// Open config file
-	simple_ini_parser config;
-	config.read( "config.ini" ); // TODO! path
-	
 	// Parse commandline arguments
 	std::string query, method;
 	
@@ -67,12 +63,17 @@ int main( int argc, char *argv[] ){
 		
 	}
 	
+	// Open config file
+	simple_ini_parser config;
+	config.read( ( getenv("TERMJITEN_CONFIG") == NULL ? 
+		( std::string( getenv("HOME") )+"/.config/termjiten.ini" )
+		: getenv("TERMJITEN_CONFIG") ) );
+	
 	// JMdict
 	if( string_to_bool( config.get( "jmdict.enable", "true" ), true ) ){
 		
-		// Determine jmdict path, 1. env 2. config 3. default
-		char* jmdict_env = getenv( "JMDICT" );
-		std::string jmdict_path = ( jmdict_env == NULL ? config.get( "jmdict.path", "/usr/share/termjiten/JMdict" ) : jmdict_env );
+		// Determine jmdict path, 1. config 2. default
+		std::string jmdict_path = config.get( "jmdict.path", "/usr/share/termjiten/JMdict" );
 		
 		// Open JMdict
 		dictionary_jmdict jmdict(jmdict_path);
@@ -89,10 +90,8 @@ int main( int argc, char *argv[] ){
 	// JMnedict
 	if( string_to_bool( config.get( "jmnedict.enable", "false" ), false ) ){
 		
-		// Determine jmnedict path, 1. env 2. config 3. default
-		//char* jmdict_env = getenv( "JMNEDICT" );
-		//std::string jmdict_path = ( jmdict_env == NULL ? config.get( "jmdict.path", "/usr/share/termjiten/JMdict" ) : jmdict_env );
-		std::string jmnedict_path = "JMnedict.xml";
+		// Determine jmnedict path, 1. config 2. default
+		std::string jmnedict_path = config.get( "jmnedict.path", "/usr/share/termjiten/JMnedict.xml" );
 		
 		// Open JMdict
 		dictionary_jmnedict jmnedict(jmnedict_path);
