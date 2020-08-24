@@ -51,7 +51,7 @@ You can use an .ini file to modify the output format and select which dictionari
 This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
 
 This program uses the JMdict/EDICT and JMnedict/ENAMDICT dictionary files. These files are the property of the Electronic Dictionary Research and Development Group, and are used in conformance with the Group's licence.<br>
-Copies of the documentation and license files are installed in /usr/share/doc/termjiten/jmdict and can be found in documentation/jmdict.
+Copies of the documentation and license files are installed in /usr/share/doc/termjiten/jmdict+jmnedict and can be found in documentation/jmdict+jmnedict.<br>
 http://www.edrdg.org<br>
 http://www.edrdg.org/wiki/index.php/JMdict-EDICT_Dictionary_Project<br>
 http://www.edrdg.org/enamdict/enamdict_doc.html<br>

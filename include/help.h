@@ -46,7 +46,7 @@ void print_licenses( std::ostream& output ){
 	<< "Research and Development Group, and are used in conformance "
 	<< "with the Group's licence.\n"
 	<< "Copies of the documentation and license files are installed in "
-	<< "/usr/share/doc/termjiten/jmdict.\n"
+	<< "/usr/share/doc/termjiten/jmdict+jmnedict.\n"
 	<< "http://www.edrdg.org\n"
 	<< "http://www.edrdg.org/wiki/index.php/JMdict-EDICT_Dictionary_Project\n"
 	<< "http://www.edrdg.org/enamdict/enamdict_doc.html\n"
