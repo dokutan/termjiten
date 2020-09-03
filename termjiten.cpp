@@ -70,6 +70,13 @@ int main( int argc, char *argv[] ){
 		( std::string( getenv("HOME") )+"/.config/termjiten.ini" )
 		: getenv("TERMJITEN_CONFIG") ) );
 	
+	// check if colors spefied, else save hardcoded defaults in config
+	config.map()["colors.kanji"] = "\e" + config.get( "colors.kanji", "[91m" );
+	config.map()["colors.kana"] = "\e" + config.get( "colors.kana", "[94m" );
+	config.map()["colors.trans"] = "\e" + config.get( "colors.trans", "[0m" );
+	config.map()["colors.extra"] = "\e" + config.get( "colors.extra", "[92m" );
+	config.map()["colors.reset"] = "\e" + config.get( "colors.reset", "[0m" );
+	
 	// JMdict
 	if( string_to_bool( config.get( "jmdict.enable", "true" ), true ) ){
 		

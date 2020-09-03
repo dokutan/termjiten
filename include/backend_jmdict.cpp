@@ -33,31 +33,23 @@ void dictionary_jmdict::print_entry( pugi::xml_node& entry, std::ostream& output
 	bool verbose = string_to_bool( options["jmdict.verbose"], true );
 	bool symbols = string_to_bool( options["jmdict.symbols"], false );
 	
-	std::map< std::string, std::string > colors = {
-		{"keb", "\e[91m"},
-		{"reb", "\e[94m"},
-		{"gloss", "\e[30m"},
-		{"extra", "\e[92m"},
-		{"reset", "\e[0m"}
-	};
-	
 	output << "\n";
 	
 	// print all k_ele.keb (kanji)
 	for( pugi::xml_node k_ele : entry.children("k_ele") ){
 		for( pugi::xml_node keb : k_ele.children("keb") ){
-			output << (color ? colors["keb"] : "");
+			output << (color ? options["colors.kanji"] : "");
 			output << keb.child_value() << "\n";
-			output << (color ? colors["reset"] : "");
+			output << (color ? options["colors.reset"] : "");
 		}
 		
 		if( verbose ){
 			
 			// kanji information
 			for( pugi::xml_node ke_inf : k_ele.children("ke_inf") ){
-				output << (color ? colors["extra"] : "");
+				output << (color ? options["colors.extra"] : "");
 				output << (symbols ? "🛈 " : "Info: ") << entities[ke_inf.child_value()] << "\n";
-				output << (color ? colors["reset"] : "");
+				output << (color ? options["colors.reset"] : "");
 			}
 		}
 		
@@ -67,9 +59,9 @@ void dictionary_jmdict::print_entry( pugi::xml_node& entry, std::ostream& output
 	// print all r_ele.reb (reading)
 	for( pugi::xml_node r_ele : entry.children("r_ele") ){
 		for( pugi::xml_node reb : r_ele.children("reb") ){
-			output << (color ? colors["reb"] : "");
+			output << (color ? options["colors.kana"] : "");
 			output << reb.child_value() << "\n";
-			output << (color ? colors["reset"] : "");
+			output << (color ? options["colors.reset"] : "");
 		}
 		
 		// print extra information if requested
@@ -77,16 +69,16 @@ void dictionary_jmdict::print_entry( pugi::xml_node& entry, std::ostream& output
 			
 			// reading information
 			for( pugi::xml_node re_inf : r_ele.children("re_inf") ){
-				output << (color ? colors["extra"] : "");
+				output << (color ? options["colors.extra"] : "");
 				output << (symbols ? "🛈 " : "Info: ") << entities[re_inf.child_value()] << "\n";
-				output << (color ? colors["reset"] : "");
+				output << (color ? options["colors.reset"] : "");
 			}
 			
 			// reading restricted to one kanji element
 			for( pugi::xml_node re_restr : r_ele.children("re_restr") ){
-				output << (color ? colors["extra"] : "");
+				output << (color ? options["colors.extra"] : "");
 				output << (symbols ? "⚠ " : "Restricted to: ") << re_restr.child_value() << "\n";
-				output << (color ? colors["reset"] : "");
+				output << (color ? options["colors.reset"] : "");
 			}
 			
 		}
@@ -108,11 +100,11 @@ void dictionary_jmdict::print_entry( pugi::xml_node& entry, std::ostream& output
 			if( verbose && gloss.attribute("g_type") ){
 				
 				std::string meaning = gloss.child_value();
-				meaning.append( color ? colors["extra"] : "" );
+				meaning.append( color ? options["colors.extra"] : "" );
 				meaning.append( " (" );
 				meaning.append( gloss.attribute("g_type").value() );
 				meaning.append( ")" );
-				meaning.append( color ? colors["reset"] : "" );
+				meaning.append( color ? options["colors.reset"] : "" );
 				
 				meanings.push_back( meaning );
 				
@@ -122,64 +114,64 @@ void dictionary_jmdict::print_entry( pugi::xml_node& entry, std::ostream& output
 			
 		}
 		if( meanings.size() > 0 )
-			output << (color ? colors["gloss"] : "") << meanings[0];
+			output << (color ? options["colors.trans"] : "") << meanings[0];
 		for( size_t i = 1; i < meanings.size(); i++ )
 			output << ", " << meanings[i];
 		if( meanings.size() > 0 )
-			output << (color ? colors["reset"] : "") << "\n";
+			output << (color ? options["colors.reset"] : "") << "\n";
 		
 		// print extra information if requested
 		if( verbose ){
 			
 			// sense information
 			for( pugi::xml_node s_inf : sense.children("s_inf") ){
-				output << (color ? colors["extra"] : "");
+				output << (color ? options["colors.extra"] : "");
 				output << (symbols ? "🛈 " : "Info: ") << s_inf.child_value() << "\n";
-				output << (color ? colors["reset"] : "");
+				output << (color ? options["colors.reset"] : "");
 			}
 			
 			// restricted meanings
 			for( pugi::xml_node stagk : sense.children("stagk") ){
-				output << (color ? colors["extra"] : "");
+				output << (color ? options["colors.extra"] : "");
 				output << (symbols ? "⚠ " : "Restricted to: ") << stagk.child_value() << "\n";
-				output << (color ? colors["reset"] : "");
+				output << (color ? options["colors.reset"] : "");
 			}
 			for( pugi::xml_node stagr : sense.children("stagr") ){
-				output << (color ? colors["extra"] : "");
+				output << (color ? options["colors.extra"] : "");
 				output << (symbols ? "⚠ " : "Restricted to: ") << stagr.child_value() << "\n";
-				output << (color ? colors["reset"] : "");
+				output << (color ? options["colors.reset"] : "");
 			}
 			
 			// pos
 			for( pugi::xml_node pos : sense.children("pos") ){
-				output << (color ? colors["extra"] : "");
+				output << (color ? options["colors.extra"] : "");
 				output << (symbols ? "💬 " : "Part-of-speech: ") << entities[pos.child_value()] << "\n";
-				output << (color ? colors["reset"] : "");
+				output << (color ? options["colors.reset"] : "");
 			}
 			
 			// dialect TODO!
 			
 			// antonym
 			for( pugi::xml_node ant : sense.children("ant") ){
-				output << (color ? colors["extra"] : "");
+				output << (color ? options["colors.extra"] : "");
 				output << (symbols ? "± " : "Antonym: ") << ant.child_value() << "\n";
-				output << (color ? colors["reset"] : "");
+				output << (color ? options["colors.reset"] : "");
 			}
 			
 			// field
 			for( pugi::xml_node field : sense.children("field") ){
-				output << (color ? colors["extra"] : "");
+				output << (color ? options["colors.extra"] : "");
 				output << (symbols ? "Ⓕ " : "Field: ") << entities[field.child_value()] << "\n";
-				output << (color ? colors["reset"] : "");
+				output << (color ? options["colors.reset"] : "");
 			}
 			
 			// misc TODO!
 			
 			// cross references
 			for( pugi::xml_node xref : sense.children("xref") ){
-				output << (color ? colors["extra"] : "");
+				output << (color ? options["colors.extra"] : "");
 				output << (symbols ? "⇒ " : "See also: ") << xref.child_value() << "\n";
-				output << (color ? colors["reset"] : "");
+				output << (color ? options["colors.reset"] : "");
 			}
 			
 		}

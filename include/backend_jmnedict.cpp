@@ -33,31 +33,23 @@ void dictionary_jmnedict::print_entry( pugi::xml_node& entry, std::ostream& outp
 	bool verbose = string_to_bool( options["jmnedict.verbose"], true );
 	bool symbols = string_to_bool( options["jmnedict.symbols"], false );
 	
-	std::map< std::string, std::string > colors = {
-		{"keb", "\e[91m"},
-		{"reb", "\e[94m"},
-		{"trans", "\e[30m"},
-		{"extra", "\e[92m"},
-		{"reset", "\e[0m"}
-	};
-	
 	output << "\n";
 	
 	// print all k_ele.keb (kanji)
 	for( pugi::xml_node k_ele : entry.children("k_ele") ){
 		for( pugi::xml_node keb : k_ele.children("keb") ){
-			output << (color ? colors["keb"] : "");
+			output << (color ? options["colors.kanji"] : "");
 			output << keb.child_value() << "\n";
-			output << (color ? colors["reset"] : "");
+			output << (color ? options["colors.reset"] : "");
 		}
 		
 		if( verbose ){
 			
 			// kanji information
 			for( pugi::xml_node ke_inf : k_ele.children("ke_inf") ){
-				output << (color ? colors["extra"] : "");
+				output << (color ? options["colors.extra"] : "");
 				output << (symbols ? "🛈 " : "Info: ") << entities[ke_inf.child_value()] << "\n";
-				output << (color ? colors["reset"] : "");
+				output << (color ? options["colors.reset"] : "");
 			}
 		}
 		
@@ -67,9 +59,9 @@ void dictionary_jmnedict::print_entry( pugi::xml_node& entry, std::ostream& outp
 	// print all r_ele.reb (reading)
 	for( pugi::xml_node r_ele : entry.children("r_ele") ){
 		for( pugi::xml_node reb : r_ele.children("reb") ){
-			output << (color ? colors["reb"] : "");
+			output << (color ? options["colors.kana"] : "");
 			output << reb.child_value() << "\n";
-			output << (color ? colors["reset"] : "");
+			output << (color ? options["colors.reset"] : "");
 		}
 		
 		// print extra information if requested
@@ -77,16 +69,16 @@ void dictionary_jmnedict::print_entry( pugi::xml_node& entry, std::ostream& outp
 			
 			// reading information
 			for( pugi::xml_node re_inf : r_ele.children("re_inf") ){
-				output << (color ? colors["extra"] : "");
+				output << (color ? options["colors.extra"] : "");
 				output << (symbols ? "🛈 " : "Info: ") << entities[re_inf.child_value()] << "\n";
-				output << (color ? colors["reset"] : "");
+				output << (color ? options["colors.reset"] : "");
 			}
 			
 			// reading restricted to one kanji element
 			for( pugi::xml_node re_restr : r_ele.children("re_restr") ){
-				output << (color ? colors["extra"] : "");
+				output << (color ? options["colors.extra"] : "");
 				output << (symbols ? "⚠ " : "Restricted to: ") << re_restr.child_value() << "\n";
-				output << (color ? colors["reset"] : "");
+				output << (color ? options["colors.reset"] : "");
 			}
 			
 		}
@@ -109,27 +101,27 @@ void dictionary_jmnedict::print_entry( pugi::xml_node& entry, std::ostream& outp
 		}
 		
 		if( meanings.size() > 0 )
-			output << (color ? colors["trans"] : "") << meanings[0];
+			output << (color ? options["colors.trans"] : "") << meanings[0];
 		for( size_t i = 1; i < meanings.size(); i++ )
 			output << ", " << meanings[i];
 		if( meanings.size() > 0 )
-			output << (color ? colors["reset"] : "") << "\n";
+			output << (color ? options["colors.reset"] : "") << "\n";
 		
 		// print extra information if requested
 		if( verbose ){
 			
 			// name type
 			for( pugi::xml_node name_type : trans.children("name_type") ){
-				output << (color ? colors["extra"] : "");
+				output << (color ? options["colors.extra"] : "");
 				output << (symbols ? "Ⓣ " : "Type: ") << entities[name_type.child_value()] << "\n";
-				output << (color ? colors["reset"] : "");
+				output << (color ? options["colors.reset"] : "");
 			}
 			
 			// cross references
 			for( pugi::xml_node xref : trans.children("xref") ){
-				output << (color ? colors["extra"] : "");
+				output << (color ? options["colors.extra"] : "");
 				output << (symbols ? "⇒ " : "See also: ") << xref.child_value() << "\n";
-				output << (color ? colors["reset"] : "");
+				output << (color ? options["colors.reset"] : "");
 			}
 			
 		}

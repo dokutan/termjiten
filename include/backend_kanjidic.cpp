@@ -33,21 +33,13 @@ void dictionary_kanjidic::print_entry( pugi::xml_node& character, std::ostream& 
 	bool verbose = string_to_bool( options["kanjidic.verbose"], true );
 	bool symbols = string_to_bool( options["kanjidic.symbols"], false );
 	
-	std::map< std::string, std::string > colors = {
-		{"keb", "\e[91m"},
-		{"reb", "\e[94m"},
-		{"trans", "\e[30m"},
-		{"extra", "\e[92m"},
-		{"reset", "\e[0m"}
-	};
-	
 	output << "\n";
 	
 	// print character.literal (kanji)
 	for( pugi::xml_node literal : character.children("literal") ){
-		output << (color ? colors["keb"] : "");
+		output << (color ? options["colors.kanji"] : "");
 		output << literal.child_value() << "\n";
-		output << (color ? colors["reset"] : "");
+		output << (color ? options["colors.reset"] : "");
 	}
 	
 	// print readings and meanings of the character
@@ -63,9 +55,9 @@ void dictionary_kanjidic::print_entry( pugi::xml_node& character, std::ostream& 
 				if( strcmp( reading.attribute("r_type").as_string(), "ja_on" ) == 0 || 
 					strcmp( reading.attribute("r_type").as_string(), "ja_kun" ) == 0 ){
 					
-					output << (color ? colors["reb"] : "");
+					output << (color ? options["colors.kana"] : "");
 					output << reading.child_value() << "\n";
-					output << (color ? colors["reset"] : "");
+					output << (color ? options["colors.reset"] : "");
 						
 				}
 				
@@ -76,9 +68,9 @@ void dictionary_kanjidic::print_entry( pugi::xml_node& character, std::ostream& 
 				
 				// if english meaning
 				if( !meaning.attribute("m_lang") ){
-					output << (color ? colors["trans"] : "");
+					output << (color ? options["colors.trans"] : "");
 					output << meaning.child_value() << "\n";
-					output << (color ? colors["reset"] : "");
+					output << (color ? options["colors.reset"] : "");
 				}
 				
 			}
@@ -92,7 +84,7 @@ void dictionary_kanjidic::print_entry( pugi::xml_node& character, std::ostream& 
 	
 	// additional information
 	if( verbose ){
-		output << (color ? colors["extra"] : "");
+		output << (color ? options["colors.extra"] : "");
 	
 		// codepoint
 		for( pugi::xml_node cp_value : character.child("codepoint").children("cp_value") ){
@@ -143,7 +135,7 @@ void dictionary_kanjidic::print_entry( pugi::xml_node& character, std::ostream& 
 		
 		// dic_ref TODO!
 		
-		output << (color ? colors["reset"] : "");
+		output << (color ? options["colors.reset"] : "");
 	}
 
 }
