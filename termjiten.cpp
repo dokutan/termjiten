@@ -28,6 +28,7 @@
 #include "include/utils.h"
 #include "include/backend_jmdict.h"
 #include "include/backend_jmnedict.h"
+#include "include/backend_kanjidic.h"
 
 int main( int argc, char *argv[] ){
 	
@@ -102,6 +103,24 @@ int main( int argc, char *argv[] ){
 		
 		// Perform search
 		jmnedict.search( query, method, std::cout, config.map() );
+		
+	}
+	
+	// kanjidic
+	if( string_to_bool( config.get( "jmnedict.enable", "true" ), true ) ){
+		
+		// Determine kanjidic path, 1. config 2. default
+		std::string kanjidic_path = config.get( "kanjidic.path", "/usr/share/termjiten/kanjidic2.xml" );
+		
+		// Open kanjidic
+		dictionary_kanjidic kanjidic(kanjidic_path);
+		if( !kanjidic.is_open() ){
+			std::cerr << "Error: could not open " << kanjidic_path << "\n";
+			return 1;
+		}
+		
+		// Perform search
+		kanjidic.search( query, method, std::cout, config.map() );
 		
 	}
 	

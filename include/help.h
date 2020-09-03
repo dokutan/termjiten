@@ -41,15 +41,22 @@ void print_licenses( std::ostream& output ){
 	<< "the License, or (at your option) any later version.\n\n";
 	
 	output
-	<< "This program uses the JMdict/EDICT and JMnedict/ENAMDICT dictionary files. "
+	<< "This program uses the JMdict/EDICT, JMnedict/ENAMDICT and KANJIDIC dictionary files. "
 	<< "These files are the property of the Electronic Dictionary "
 	<< "Research and Development Group, and are used in conformance "
 	<< "with the Group's licence.\n"
 	<< "Copies of the documentation and license files are installed in "
-	<< "/usr/share/doc/termjiten/jmdict+jmnedict.\n"
+	<< "/usr/share/doc/termjiten/jmdict+jmnedict+kanjidic.\n"
 	<< "http://www.edrdg.org\n"
 	<< "http://www.edrdg.org/wiki/index.php/JMdict-EDICT_Dictionary_Project\n"
 	<< "http://www.edrdg.org/enamdict/enamdict_doc.html\n"
-	<< "http://www.edrdg.org/edrdg/licence.html\n";
+	<< "http://www.edrdg.org/wiki/index.php/KANJIDIC_Project\n"
+	<< "http://www.edrdg.org/edrdg/licence.html\n\n";
+	
+	output
+	<< "The SKIP (System of Kanji Indexing by Patterns) system for "
+	<< "ordering kanji was developed by Jack Halpern (Kanji Dictionary "
+	<< "Publishing Society at http://www.kanji.org/), and is used with "
+	<< "his permission.\n";
 	
 }
