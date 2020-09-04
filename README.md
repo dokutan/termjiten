@@ -41,13 +41,20 @@ Regex based search term matching
 ```
 termjiten -r query
 ```
+Search only in the KANJIDIC and JMnedict dictionaries
+```
+termjiten -s kanjidic,jmnedict …
+```
+Make the output searchable and scrollable
+```
+termjiten … | less -R
+```
 
 ### Configuration
 You can use an .ini file to modify the output format and select which dictionaries should be searched. The default path for this is ``$HOME/.config/termjiten.ini``, if the ``TERMJITEN_CONFIG`` environmental variable is set, that is used as a path. An annotated example is found in this directory.
 
 ## TODO
 - Use additional sources to display more detailed information
-- Add an option to select the sources
 - Optionally display translations in more/different languages
 
 ## Limitations an potential problems

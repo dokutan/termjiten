@@ -27,6 +27,8 @@ void print_help( std::ostream& output ){
 	<< "-e QUERY\tsearch (exact matching)\n"
 	<< "-f QUERY\tsearch (fuzzy matching)\n"
 	<< "-f QUERY\tsearch (regex matching)\n"
+	<< "-s SOURCES\tsearch only in the specified dictionaries\n"
+	<< "\t\t(jmdict, jmnedict, kanjidic)\n"
 	<< "-l\t\tshow license and source informaton\n"
 	<< "-h\t\tshow this message\n";
 	

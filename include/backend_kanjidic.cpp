@@ -31,7 +31,7 @@ void dictionary_kanjidic::print_entry( pugi::xml_node& character, std::ostream& 
 	// parse options
 	bool color = string_to_bool( options["kanjidic.color"], true );
 	bool verbose = string_to_bool( options["kanjidic.verbose"], true );
-	bool symbols = string_to_bool( options["kanjidic.symbols"], false );
+	//bool symbols = string_to_bool( options["kanjidic.symbols"], false );
 	
 	output << "\n";
 	

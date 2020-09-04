@@ -77,8 +77,29 @@ int main( int argc, char *argv[] ){
 	config.map()["colors.extra"] = "\e" + config.get( "colors.extra", "[92m" );
 	config.map()["colors.reset"] = "\e" + config.get( "colors.reset", "[0m" );
 	
+	// Determine which dictionaries should be used, commandline > config
+	bool use_jmdict = false, use_jmnedict = false, use_kanjidic = false;
+	std::string sources = "";
+	if( option_get_argument( "-s", sources, argc, argv ) ){
+		
+		if( sources.find("jmdict") != std::string::npos )
+			use_jmdict = true;
+		
+		if( sources.find("jmnedict") != std::string::npos )
+			use_jmnedict = true;
+		
+		if( sources.find("kanjidic") != std::string::npos )
+			use_kanjidic = true;
+		
+	} else{
+		// check config
+		use_jmdict = string_to_bool( config.get( "jmdict.enable", "true" ), true );
+		use_jmnedict = string_to_bool( config.get( "jmnedict.enable", "false" ), false );
+		use_kanjidic = string_to_bool( config.get( "kanjidic.enable", "true" ), true );
+	}
+	
 	// JMdict
-	if( string_to_bool( config.get( "jmdict.enable", "true" ), true ) ){
+	if( use_jmdict ){
 		
 		// Determine jmdict path, 1. config 2. default
 		std::string jmdict_path = config.get( "jmdict.path", "/usr/share/termjiten/JMdict" );
@@ -96,7 +117,7 @@ int main( int argc, char *argv[] ){
 	}
 	
 	// JMnedict
-	if( string_to_bool( config.get( "jmnedict.enable", "false" ), false ) ){
+	if( use_jmnedict ){
 		
 		// Determine jmnedict path, 1. config 2. default
 		std::string jmnedict_path = config.get( "jmnedict.path", "/usr/share/termjiten/JMnedict.xml" );
@@ -114,7 +135,7 @@ int main( int argc, char *argv[] ){
 	}
 	
 	// kanjidic
-	if( string_to_bool( config.get( "jmnedict.enable", "true" ), true ) ){
+	if( use_kanjidic ){
 		
 		// Determine kanjidic path, 1. config 2. default
 		std::string kanjidic_path = config.get( "kanjidic.path", "/usr/share/termjiten/kanjidic2.xml" );
