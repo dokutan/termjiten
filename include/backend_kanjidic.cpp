@@ -31,7 +31,7 @@ void dictionary_kanjidic::print_entry( pugi::xml_node& character, std::ostream& 
 	// parse options
 	bool color = string_to_bool( options["kanjidic.color"], true );
 	bool verbose = string_to_bool( options["kanjidic.verbose"], true );
-	//bool symbols = string_to_bool( options["kanjidic.symbols"], false );
+	bool symbols = string_to_bool( options["kanjidic.symbols"], false );
 	
 	output << "\n";
 	
@@ -51,16 +51,38 @@ void dictionary_kanjidic::print_entry( pugi::xml_node& character, std::ostream& 
 			// readings
 			for( pugi::xml_node reading : rmgroup.children("reading") ){
 				
-				// if japanese reading, TODO! mark jouyou kanji readings
+				// if japanese reading
 				if( strcmp( reading.attribute("r_type").as_string(), "ja_on" ) == 0 || 
 					strcmp( reading.attribute("r_type").as_string(), "ja_kun" ) == 0 ){
 					
 					output << (color ? options["colors.kana"] : "");
-					output << reading.child_value() << "\n";
-					output << (color ? options["colors.reset"] : "");
+					output << reading.child_value();
+					
+					// type of reading
+					/* these are described in the DTD but don't seem to be used
+					if( reading.attribute("on_type") ){
+						output << (color ? options["colors.extra"] : "");
+						output << " (" << reading.attribute("on_type").as_string() << ")";
+					}
+					
+					if( strcmp( reading.attribute("r_status").as_string(), "jy" ) == 0 ){
+						output << (color ? options["colors.extra"] : "");
+						output << " (jouyou kanji)";
+					}
+					*/
+					
+					output << "\n" << (color ? options["colors.reset"] : "");
 						
 				}
 				
+			}
+			
+			// nanori (readings only associated with names)
+			for( pugi::xml_node nanori : reading_meaning.children("nanori") ){
+				output << (color ? options["colors.kana"] : "");
+				output << nanori.child_value();
+				output << (color ? options["colors.extra"] : "") << " (nanori)\n";
+				output << (color ? options["colors.reset"] : "");
 			}
 			
 			// meanings
@@ -77,8 +99,6 @@ void dictionary_kanjidic::print_entry( pugi::xml_node& character, std::ostream& 
 				
 		}
 		
-		// nanori TODO!
-		
 	}
 	
 	
@@ -86,6 +106,76 @@ void dictionary_kanjidic::print_entry( pugi::xml_node& character, std::ostream& 
 	if( verbose ){
 		output << (color ? options["colors.extra"] : "");
 	
+		// radical name (if kanji is a radical)
+		for( pugi::xml_node rad_name : character.child("misc").children("rad_name") )
+			output << "Radical name: " << rad_name.child_value() << "\n";
+		
+		// stroke count
+		output << "Strokes: ";
+		bool first = true;
+		for( pugi::xml_node stroke_count : character.child("misc").children("stroke_count") ){
+			
+			if( !first )
+				output << ", Not: ";
+			
+			first = false;
+			output << stroke_count.child_value();
+		}
+		output << "\n";
+		
+		// grade
+		for( pugi::xml_node grade : character.child("misc").children("grade") )
+			output << "Grade (1-10): " << grade.child_value() << "\n";
+		
+		// jlpt level
+		for( pugi::xml_node jlpt : character.child("misc").children("jlpt") )
+			output << "Former JLPT level (4-1): " << jlpt.child_value() << "\n";
+		
+		// query code
+		first = true;
+		for( pugi::xml_node q_code : character.child("query_code").children("q_code") ){
+			
+			// SKIP
+			if( strcmp( q_code.attribute("qc_type").as_string(), "skip" ) == 0 ){
+				output << (first ? "" : ", ") << "SKIP: ";
+				output << (q_code.attribute("skip_misclass") ? "not " : "");
+				output << q_code.child_value();
+				first = false;
+			}
+			// The Kanji Dictionary (Tuttle 1996) by Spahn and Hadamitzky
+			else if( strcmp( q_code.attribute("qc_type").as_string(), "sh_desc" ) == 0 ){
+				output << (first ? "" : ", ") << "Spahn and Hadamitzky: ";
+				// output << (q_code.attribute("misclass") ? "not " : ""); // unused
+				output << q_code.child_value();
+				first = false;
+			}
+			// Four corner
+			else if( strcmp( q_code.attribute("qc_type").as_string(), "four_corner" ) == 0 ){
+				output << (first ? "" : ", ") << "Four corner: ";
+				// output << (q_code.attribute("misclass") ? "not " : ""); // unused
+				output << q_code.child_value();
+				first = false;
+			}
+			// De Roo
+			else if( strcmp( q_code.attribute("qc_type").as_string(), "deroo" ) == 0 ){
+				output << (first ? "" : ", ") << "De Roo: ";
+				// output << (q_code.attribute("misclass") ? "not " : ""); // unused
+				output << q_code.child_value();
+				first = false;
+			}
+			
+		}
+		output << "\n";
+		
+		// TODO! dic_number.dic_ref
+		
+		// variant or cross-reference, TODO! type
+		/*for( pugi::xml_node variant : character.child("misc").children("variant") ){
+			output << (color ? options["colors.extra"] : "");
+			output << (symbols ? "⇒ " : "See also: ") << variant.child_value() << "\n";
+			output << (color ? options["colors.reset"] : "");
+		}*/
+		
 		// codepoint
 		for( pugi::xml_node cp_value : character.child("codepoint").children("cp_value") ){
 			
@@ -107,33 +197,6 @@ void dictionary_kanjidic::print_entry( pugi::xml_node& character, std::ostream& 
 			
 		}
 		output << "\n";
-	
-		// radical name (if kanji is a radical)
-		for( pugi::xml_node rad_name : character.child("misc").children("rad_name") )
-			output << "Radical name: " << rad_name.child_value() << "\n";
-		
-		// stroke count
-		output << "Strokes: ";
-		bool first = true;
-		for( pugi::xml_node stroke_count : character.child("misc").children("stroke_count") ){
-			
-			if( !first )
-				output << ", Not: ";
-			
-			first = false;
-			output << stroke_count.child_value();
-		}
-		output << "\n";
-		
-		// grade TODO!
-		
-		// jlpt level
-		for( pugi::xml_node jlpt : character.child("misc").children("jlpt") )
-			output << "Former JLPT level (4-1): " << jlpt.child_value() << "\n";
-		
-		// query code TODO!
-		
-		// dic_ref TODO!
 		
 		output << (color ? options["colors.reset"] : "");
 	}
@@ -159,7 +222,49 @@ void dictionary_kanjidic::search( std::string query, std::string method, std::os
 				match_found = true;
 		}
 		
-		// TODO! more search options: query code, reading
+		// match in reading
+		for( pugi::xml_node reading : character.child("reading_meaning").child("rmgroup").children("reading") ){
+			
+			// non-japanese reading?
+			if( strcmp( reading.attribute("r_type").as_string(), "ja_on" ) != 0 && 
+				strcmp( reading.attribute("r_type").as_string(), "ja_kun" ) != 0 ){
+					continue;
+			}
+			
+			if( comp( reading.child_value(), query ) )
+				match_found = true;
+		}
+		
+		// match in nanori
+		for( pugi::xml_node nanori : character.child("reading_meaning").children("nanori") ){
+			if( comp( nanori.child_value(), query ) )
+				match_found = true;
+		}
+		
+		// match in query code
+		for( pugi::xml_node q_code : character.child("query_code").children("q_code") ){
+			if( comp( q_code.child_value(), query ) )
+				match_found = true;
+		}
+		
+		// match in meanings
+		for( pugi::xml_node meaning : character.child("reading_meaning").child("rmgroup").children("meaning") ){
+			
+			// if non-english meaning
+			if( meaning.attribute("m_lang") )
+				continue;
+			
+			if( comp( meaning.child_value(), query ) )
+				match_found = true;
+		}
+		
+		// match in codepoint
+		for( pugi::xml_node cp_value : character.child("codepoint").children("cp_value") ){
+			if( comp( cp_value.child_value(), query ) )
+				match_found = true;
+		}
+		
+		// TODO! search in dic_number.dic_ref
 		
 		// if match, print entry
 		if( match_found )

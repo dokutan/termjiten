@@ -149,12 +149,10 @@ void dictionary_jmdict::print_entry( pugi::xml_node& entry, std::ostream& output
 				output << (color ? options["colors.reset"] : "");
 			}
 			
-			// dialect TODO!
-			
-			// antonym
-			for( pugi::xml_node ant : sense.children("ant") ){
+			// dialect
+			for( pugi::xml_node dial : sense.children("dial") ){
 				output << (color ? options["colors.extra"] : "");
-				output << (symbols ? "± " : "Antonym: ") << ant.child_value() << "\n";
+				output << "Dialect: " << entities[dial.child_value()] << "\n";
 				output << (color ? options["colors.reset"] : "");
 			}
 			
@@ -165,7 +163,19 @@ void dictionary_jmdict::print_entry( pugi::xml_node& entry, std::ostream& output
 				output << (color ? options["colors.reset"] : "");
 			}
 			
-			// misc TODO!
+			// misc
+			for( pugi::xml_node misc : sense.children("misc") ){
+				output << (color ? options["colors.extra"] : "");
+				output << (symbols ? "🛈 " : "Misc: ") << entities[misc.child_value()] << "\n";
+				output << (color ? options["colors.reset"] : "");
+			}
+			
+			// antonym
+			for( pugi::xml_node ant : sense.children("ant") ){
+				output << (color ? options["colors.extra"] : "");
+				output << (symbols ? "± " : "Antonym: ") << ant.child_value() << "\n";
+				output << (color ? options["colors.reset"] : "");
+			}
 			
 			// cross references
 			for( pugi::xml_node xref : sense.children("xref") ){

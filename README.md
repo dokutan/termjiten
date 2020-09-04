@@ -50,6 +50,8 @@ Make the output searchable and scrollable
 termjiten … | less -R
 ```
 
+You can search for english words, japanese words in kanji and kana, and query codes for kanji (e.g. SKIP, Four corner).
+
 ### Configuration
 You can use an .ini file to modify the output format and select which dictionaries should be searched. The default path for this is ``$HOME/.config/termjiten.ini``, if the ``TERMJITEN_CONFIG`` environmental variable is set, that is used as a path. An annotated example is found in this directory.
 
