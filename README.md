@@ -27,7 +27,7 @@ termjiten -h
 ```
 Show license information and sources
 ```
-termjiten -l
+termjiten -a
 ```
 Exact search term matching
 ```

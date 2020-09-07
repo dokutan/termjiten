@@ -40,7 +40,7 @@ int main( int argc, char *argv[] ){
 		print_help( std::cout );
 		return 0;
 		
-	} else if( option_exists( "-l", argc, argv ) ){
+	} else if( option_exists( "-a", argc, argv ) ){
 		
 		print_licenses( std::cout );
 		return 0;

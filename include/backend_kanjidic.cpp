@@ -31,7 +31,9 @@ void dictionary_kanjidic::print_entry( pugi::xml_node& character, std::ostream& 
 	// parse options
 	bool color = string_to_bool( options["kanjidic.color"], true );
 	bool verbose = string_to_bool( options["kanjidic.verbose"], true );
-	bool symbols = string_to_bool( options["kanjidic.symbols"], false );
+	
+	// currently not used
+	// bool symbols = string_to_bool( options["kanjidic.symbols"], false );
 	
 	output << "\n";
 	
@@ -92,6 +94,13 @@ void dictionary_kanjidic::print_entry( pugi::xml_node& character, std::ostream& 
 				if( !meaning.attribute("m_lang") ){
 					output << (color ? options["colors.trans"] : "");
 					output << meaning.child_value() << "\n";
+					output << (color ? options["colors.reset"] : "");
+				}
+				
+				// non-english meaning
+				else if( options["kanjidic.languages"].find( meaning.attribute("m_lang").as_string() ) != std::string::npos ){
+					output << (color ? options["colors.trans"] : "");
+					output << "[" << meaning.attribute("m_lang").as_string() << "] " << meaning.child_value() << "\n";
 					output << (color ? options["colors.reset"] : "");
 				}
 				
@@ -250,8 +259,8 @@ void dictionary_kanjidic::search( std::string query, std::string method, std::os
 		// match in meanings
 		for( pugi::xml_node meaning : character.child("reading_meaning").child("rmgroup").children("meaning") ){
 			
-			// if non-english meaning
-			if( meaning.attribute("m_lang") )
+			// if meaning in language that should not be included
+			if( options["kanjidic.languages"].find( meaning.attribute("m_lang").as_string() ) == std::string::npos )
 				continue;
 			
 			if( comp( meaning.child_value(), query ) )

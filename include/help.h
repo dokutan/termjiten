@@ -29,7 +29,7 @@ void print_help( std::ostream& output ){
 	<< "-f QUERY\tsearch (regex matching)\n"
 	<< "-s SOURCES\tsearch only in the specified dictionaries\n"
 	<< "\t\t(jmdict, jmnedict, kanjidic)\n"
-	<< "-l\t\tshow license and source informaton\n"
+	<< "-a\t\tshow license and source informaton\n"
 	<< "-h\t\tshow this message\n";
 	
 }

@@ -92,25 +92,34 @@ void dictionary_jmdict::print_entry( pugi::xml_node& entry, std::ostream& output
 		std::vector < std::string > meanings;
 		for( pugi::xml_node gloss : sense.children("gloss") ){
 			
-			// non-english meaning?
-			if( gloss.attribute("xml:lang") )
-				continue;
+			std::string meaning = "";
 			
-			// type? store meaning
+			// non-english meaning? store language code
+			if( gloss.attribute("xml:lang") && options["jmdict.languages"].find( gloss.attribute("xml:lang").as_string() ) != std::string::npos ){
+				
+				meaning.append( "[" );
+				meaning.append( gloss.attribute("xml:lang").as_string() );
+				meaning.append( "] " );
+				
+			} else if( gloss.attribute("xml:lang") ){
+				continue;
+			}
+			
+			// store meaning
+			meaning.append( gloss.child_value() );
+			
+			// type? store type
 			if( verbose && gloss.attribute("g_type") ){
 				
-				std::string meaning = gloss.child_value();
 				meaning.append( color ? options["colors.extra"] : "" );
 				meaning.append( " (" );
 				meaning.append( gloss.attribute("g_type").value() );
 				meaning.append( ")" );
 				meaning.append( color ? options["colors.reset"] : "" );
 				
-				meanings.push_back( meaning );
-				
-			} else{
-				meanings.push_back( gloss.child_value() );
 			}
+			
+			meanings.push_back( meaning );
 			
 		}
 		if( meanings.size() > 0 )
@@ -219,13 +228,14 @@ void dictionary_jmdict::search( std::string query, std::string method, std::ostr
 			}
 		}
 
-		// match in sense.gloss (english meaning)?
+		// match in sense.gloss (meaning)?
 		for( pugi::xml_node sense : entry.children("sense") ){
 			for( pugi::xml_node gloss : sense.children("gloss") ){
 				
-				// non-english meaning?
-				if( gloss.attribute("xml:lang") )
+				// is language wanted?
+				if( options["jmdict.languages"].find( gloss.attribute("xml:lang").as_string() ) == std::string::npos ){
 					continue;
+				}
 				
 				if( comp( gloss.child_value(), query ) )
 					match_found = true;
