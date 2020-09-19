@@ -56,8 +56,7 @@ You can search for english words, japanese words in kanji and kana, and query co
 You can use an .ini file to modify the output format and select which dictionaries should be searched. The default path for this is ``$HOME/.config/termjiten.ini``, if the ``TERMJITEN_CONFIG`` environmental variable is set, that is used as a path. An annotated example is found in this directory.
 
 ## TODO
-- Use additional sources to display more detailed information
-- Optionally display translations in more/different languages
+- Maybe use additional sources to display more information
 
 ## Limitations an potential problems
 - If you don't see any japanese characters, install an appropriate font and use a terminal emulator that supports UTF-8
